@@ -1,16 +1,7 @@
 #include <iostream>
 #include "commands/commands_include.h"
-
-void loop_main() {
-
-}
-
-int startup() {
-    std::cout << "VShell "
-}
+#include "utils/XmlWorker.h"
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-
-    ls();
+    XmlWorker xmlWorker("appsettings.xml");
 }
