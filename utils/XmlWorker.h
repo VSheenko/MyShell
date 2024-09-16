@@ -1,7 +1,3 @@
-//
-// Created by vovan on 15.09.2024.
-//
-
 #ifndef MYSHELL_XMLWORKER_H
 #define MYSHELL_XMLWORKER_H
 

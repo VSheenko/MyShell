@@ -1,7 +1,3 @@
-//
-// Created by vovan on 15.09.2024.
-//
-
 #include "XmlWorker.h"
 #include <iostream>
 #include <unordered_map>

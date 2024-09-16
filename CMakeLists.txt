@@ -15,5 +15,7 @@ add_executable(MyShell main.cpp
         utils/XmlWorker.h
         libs/tinyxml2/tinyxml2.cpp
         libs/tinyxml2/tinyxml2.h
+        utils/Logger.cpp
+        utils/Logger.h
 )
 
