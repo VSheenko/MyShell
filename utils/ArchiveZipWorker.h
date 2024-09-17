@@ -5,6 +5,8 @@
 #include <string>
 #include "miniz.h"
 #include <filesystem>
+#include <vector>
+#include <iostream>
 
 namespace fs = std::filesystem;
 
@@ -13,10 +15,14 @@ public:
     ArchiveZipWorker(std::string);
     bool DeleteFile(std::string);
     bool DeleteDirectory(std::string);
-    bool AddFile();
+    bool AddFile(std::string s_path);
+    void ChangeDirectory(std::string);
+    bool GetAllFilesNameInFolder(std::string s_path, std::vector<std::string>&);
+    bool GetFileData(const std::string &, std::vector<unsigned char>&);
 private:
-    mz_zip_archive archive;
+    std::vector<std::string> Split(std::string, const std::string);
     fs::path cur_directory;
+    fs::path archive_path;
 };
 
 
