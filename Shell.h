@@ -3,6 +3,10 @@
 
 #include <string>
 #include <filesystem>
+#include <algorithm>
+#include <iostream>
+#include "utils/Logger.h"
+#include <regex>
 
 namespace fs = std::filesystem;
 
@@ -11,11 +15,15 @@ private:
     std::string cur_user;
     std::string pc_name;
     fs::path cur_path;
-    fs::path log_path;
+    Logger* logger;
+
+    void SetUserName(std::string);
+    void SetPcName(std::string);
+    void SetCurPath(std::string);
 
 public:
-    Shell();
-    Shell(const std::string&);
+    Shell(const std::string&, const std::string&, const std::string&);
+    int ExecShell();
 };
 
 

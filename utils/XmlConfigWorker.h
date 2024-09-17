@@ -1,17 +1,18 @@
-#ifndef MYSHELL_XMLWORKER_H
-#define MYSHELL_XMLWORKER_H
+#ifndef MYSHELL_XMLCONFIGWORKER_H
+#define MYSHELL_XMLCONFIGWORKER_H
 
 #include <string>
 #include <filesystem>
 #include "tinyxml2.h"
 #include <vector>
+#include "Logger.h"
 
 namespace fs = std::filesystem;
 namespace xml = tinyxml2;
 
-class XmlWorker {
+class XmlConfigWorker {
 public:
-    explicit XmlWorker(const std::string&);
+    explicit XmlConfigWorker(const std::string&);
     bool SetAppsettingsPath(const std::string&);
     std::vector<std::string> GetValues(const std::string&);
 private:
@@ -23,4 +24,4 @@ private:
 };
 
 
-#endif //MYSHELL_XMLWORKER_H
+#endif //MYSHELL_XMLCONFIGWORKER_H

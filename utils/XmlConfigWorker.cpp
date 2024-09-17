@@ -1,8 +1,8 @@
-#include "XmlWorker.h"
+#include "XmlConfigWorker.h"
 #include <iostream>
 #include <unordered_map>
 #include <algorithm>
-XmlWorker::XmlWorker(const std::string& s_path) {
+XmlConfigWorker::XmlConfigWorker(const std::string& s_path) {
     bool flag = SetAppsettingsPath(s_path);
     xml::XMLError er = xml::XML_ERROR_EMPTY_DOCUMENT;
 
@@ -43,7 +43,7 @@ XmlWorker::XmlWorker(const std::string& s_path) {
     }
 }
 
-bool XmlWorker::SetAppsettingsPath(const std::string& s_path) {
+bool XmlConfigWorker::SetAppsettingsPath(const std::string& s_path) {
     fs::path temp_path = s_path;
 
     if (exists(temp_path) && temp_path.extension() == ".xml") {
@@ -53,7 +53,7 @@ bool XmlWorker::SetAppsettingsPath(const std::string& s_path) {
     return false;
 }
 
-std::vector<std::string> XmlWorker::GetValues(const std::string& s_path) {
+std::vector<std::string> XmlConfigWorker::GetValues(const std::string& s_path) {
     std::vector<std::string> vec_path = Split(s_path, "/");
     std::vector<std::string> res;
 
@@ -85,7 +85,7 @@ std::vector<std::string> XmlWorker::GetValues(const std::string& s_path) {
     return res;
 }
 
-std::vector<xml::XMLElement*> XmlWorker::GetElements(xml::XMLElement* root, std::string& s_tag) {
+std::vector<xml::XMLElement*> XmlConfigWorker::GetElements(xml::XMLElement* root, std::string& s_tag) {
     xml::XMLElement* cur = root->FirstChildElement();
     std::vector<xml::XMLElement*> res;
 
@@ -100,7 +100,7 @@ std::vector<xml::XMLElement*> XmlWorker::GetElements(xml::XMLElement* root, std:
     return res;
 }
 
-std::vector<std::string> XmlWorker::Split(std::string s, const std::string& separator) {
+std::vector<std::string> XmlConfigWorker::Split(std::string s, const std::string& separator) {
     std::vector<std::string> tokens;
     size_t pos = 0;
     std::string token;
