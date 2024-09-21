@@ -7,20 +7,26 @@
 #include <filesystem>
 #include <vector>
 #include <iostream>
+#include "UtilsMini.h"
 
 namespace fs = std::filesystem;
 
 class ArchiveZipWorker {
 public:
-    ArchiveZipWorker(std::string);
+    ArchiveZipWorker(const std::string&);
     bool DeleteFile(std::string);
     bool DeleteDirectory(std::string);
+    bool FolderExist(const std::string& s_path);
+    bool FileExist(const std::string& s_path);
     bool AddFile(std::string s_path);
     void ChangeDirectory(std::string);
-    bool GetAllFilesNameInFolder(std::string s_path, std::vector<std::string>&);
+    bool GetAllFilesNameInFolder(std::string, std::vector<std::string>&);
     bool GetFileData(const std::string &, std::vector<unsigned char>&);
+    static fs::path NormalizeVirtualPath(const fs::path& temp_path);
 private:
-    std::vector<std::string> Split(std::string, const std::string);
+    bool ZipReaderInit(mz_zip_archive&);
+    bool FindPath(mz_zip_archive& archive, const std::string& s_path);
+
     fs::path cur_directory;
     fs::path archive_path;
 };

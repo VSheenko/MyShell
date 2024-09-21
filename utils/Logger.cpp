@@ -5,7 +5,7 @@
 
 namespace fs = std::filesystem;
 
-Logger::Logger(std::string s_path) {
+Logger::Logger(const std::string s_path) {
     fs::path log_file_path = s_path;
 
     time_t now_time = time(NULL);
@@ -37,7 +37,7 @@ std::string Logger::GetLabel(LogLevel logLevel) {
         case LogLevel::DEBUG: return "DEBUG";
         case LogLevel::INFO: return "INFO";
         case LogLevel::WARNING: return "WARNING";
-        case LogLevel::ERROR: return "ERROR";
+        case LogLevel::ERR: return "ERROR";
         default: return "UNKNOWN";
     }
 }

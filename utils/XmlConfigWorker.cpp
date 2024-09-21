@@ -54,7 +54,7 @@ bool XmlConfigWorker::SetAppsettingsPath(const std::string& s_path) {
 }
 
 std::vector<std::string> XmlConfigWorker::GetValues(const std::string& s_path) {
-    std::vector<std::string> vec_path = Split(s_path, "/");
+    std::vector<std::string> vec_path = UtilsMini::Split(s_path, "/");
     std::vector<std::string> res;
 
     if(config.RootElement()->Name() != vec_path[0])
@@ -100,22 +100,4 @@ std::vector<xml::XMLElement*> XmlConfigWorker::GetElements(xml::XMLElement* root
     return res;
 }
 
-std::vector<std::string> XmlConfigWorker::Split(std::string s, const std::string& separator) {
-    std::vector<std::string> tokens;
-    size_t pos = 0;
-    std::string token;
 
-    while ((pos = s.find(separator)) != std::string::npos) {
-        token = s.substr(0, pos);
-
-        if (!token.empty())
-            tokens.push_back(token);
-
-        s.erase(0, pos + separator.length());
-    }
-
-    if (!s.empty())
-        tokens.push_back(s);
-
-    return tokens;
-}

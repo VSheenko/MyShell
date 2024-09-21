@@ -5,15 +5,15 @@
 #include <fstream>
 
 enum class LogLevel {
-    DEBUG,
+    DEBUG = 0,
     INFO,
     WARNING,
-    ERROR
+    ERR
 };
 
 class Logger {
 public:
-    explicit Logger(std::string);
+    explicit Logger(const std::string s_logs_path);
     ~Logger();
 
     void Log(LogLevel, const std::string&);

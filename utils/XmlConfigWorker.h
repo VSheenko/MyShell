@@ -6,6 +6,7 @@
 #include "tinyxml2.h"
 #include <vector>
 #include "Logger.h"
+#include "UtilsMini.h"
 
 namespace fs = std::filesystem;
 namespace xml = tinyxml2;
@@ -19,7 +20,6 @@ private:
     xml::XMLDocument config;
     fs::path file_path;
 
-    std::vector<std::string> Split(std::string, const std::string&);
     std::vector<xml::XMLElement*> GetElements(xml::XMLElement*, std::string&);
 };
 
