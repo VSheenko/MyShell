@@ -1,7 +1,6 @@
-#include <iostream>
-#include "commands/commands_include.h"
-#include "utils/XmlWorker.h"
+#include "Shell.h"
 
 int main() {
-    XmlWorker xmlWorker("appsettings.xml");
+    Shell shell("Z:\\Projects\\MyShell\\cmake-build-debug\\appsettings.xml");
+    shell.ExecShell();
 }

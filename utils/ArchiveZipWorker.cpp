@@ -87,8 +87,8 @@ bool ArchiveZipWorker::GetAllFilesNameInFolder(std::string s_path, std::vector<s
         }
 
         std::string path_name = std::string(file_stat.m_filename);
-        std::vector<std::string> tokens_1 = UtilsMini::Split(path_name, "/");
-        std::vector<std::string> tokens_2 = UtilsMini::Split(dest_path.string(), "/");
+        std::vector<std::string> tokens_1 = utils::Split(path_name, "/");
+        std::vector<std::string> tokens_2 = utils::Split(dest_path.string(), "/");
 
         bool flag = (tokens_1.size() - 1) == tokens_2.size();
         for (int ind = 0; ind < tokens_2.size(); ind++)

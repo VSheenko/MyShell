@@ -14,6 +14,8 @@
 #include <windows.h>
 
 #define EXIT_COMMAND "exit"
+#define SHARED_MEMORY_NAME "SharedMemoryForStaticField"
+#define BUF_SIZE_FOR_SHARED_MEM 128
 
 namespace fs = std::filesystem;
 
@@ -29,13 +31,19 @@ private:
 
     Logger* logger = nullptr;
 
+    HANDLE hMapFile;
+    char* pBufViewOfFile;
+
+    void SerializeStaticFields(char*);
+    void DeserializeStaticFields(const char*);
+
     void SetUserName(const std::string&);
     void SetPcName(const std::string&);
     void SetArchivePath(const std::string&);
     void SetCurPath(std::string);
 
     void PrintSystemInvitation();
-    static void ExecCommand(const std::string& args);
+    void ExecCommand(const std::string& args);
     bool InitCommands(const std::string& commands_root_folder = "commands");
 
 public:

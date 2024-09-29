@@ -11,6 +11,32 @@ Shell::Shell(const std::string& s_config_path) {
     logger = new Logger(xml_worker.GetValues("settings/log_path")[0]);
 
     InitCommands();
+
+    hMapFile = CreateFileMapping(
+            INVALID_HANDLE_VALUE,
+            NULL,
+            PAGE_READWRITE,
+            0,
+            BUF_SIZE_FOR_SHARED_MEM,
+            SHARED_MEMORY_NAME);
+
+    if (hMapFile == NULL)
+        std::runtime_error("Failed to create shared memory");
+
+    pBufViewOfFile = (char*)MapViewOfFile(
+            hMapFile,
+            FILE_MAP_ALL_ACCESS,
+            0,
+            0,
+            BUF_SIZE_FOR_SHARED_MEM);
+
+    if (pBufViewOfFile == NULL) {
+        std::runtime_error("Failed to map memory area");
+        CloseHandle(hMapFile);
+    }
+
+    SerializeStaticFields(pBufViewOfFile);
+    DeserializeStaticFields(pBufViewOfFile);
 }
 
 
@@ -82,7 +108,7 @@ int Shell::ExecShell() {
         if (s == EXIT_COMMAND)
             break;
 
-        std::vector<std::string> comm_split = UtilsMini::Split(s, " ");
+        std::vector<std::string> comm_split = utils::Split(s, " ");
 
         if (command_links.count(comm_split[0])) {
             size_t pos = s.find(" ");
@@ -132,6 +158,8 @@ void Shell::ExecCommand(const std::string& args) {
     si.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE); // Наследуем стандартный вывод
     si.hStdError = GetStdHandle(STD_ERROR_HANDLE);   // Наследуем стандартный поток ошибок
 
+    SerializeStaticFields(pBufViewOfFile);
+
     // Запуск нового процесса
     if (CreateProcess(
             nullptr,              // имя исполняемого файла
@@ -147,6 +175,8 @@ void Shell::ExecCommand(const std::string& args) {
     )) {
         // Ожидание завершения процесса
         WaitForSingleObject(pi.hProcess, INFINITE);
+
+        DeserializeStaticFields(pBufViewOfFile);
 
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
@@ -176,3 +206,47 @@ void Shell::SetArchivePath(const std::string &s_path) {
 Shell::~Shell() {
     delete logger;
 }
+
+void Shell::SerializeStaticFields(char* buffer) {
+    char* cur_pos = buffer;
+
+    auto writeString = [&](const std::string& str) {
+        size_t length = str.size();
+
+        memcpy(cur_pos, &length, sizeof(size_t));
+        cur_pos += sizeof(size_t);
+
+        memcpy(cur_pos, str.c_str(), length);
+        cur_pos += length;
+    };
+
+    if (archive_path.string().size() + cur_path_in_archive.string().size() > BUF_SIZE_FOR_SHARED_MEM)
+        std::runtime_error("Recording larger than buffer");
+
+    *pBufViewOfFile = '\0';
+
+    writeString(archive_path.string());
+    writeString(cur_path_in_archive.string());
+}
+
+void Shell::DeserializeStaticFields(const char* buffer) {
+    const char* cur_pos = buffer;
+
+    auto readString = [&](std::string& str) {
+        size_t length;
+        memcpy(&length, cur_pos, sizeof(size_t));
+        cur_pos += sizeof(size_t);
+
+        str = std::string(cur_pos, length);
+        cur_pos += length;
+    };
+
+    std::string temp_str;
+
+    readString(temp_str);
+    archive_path = temp_str;
+
+    readString(temp_str);
+    cur_path_in_archive = temp_str;
+}
+

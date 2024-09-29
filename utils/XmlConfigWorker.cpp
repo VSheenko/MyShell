@@ -54,7 +54,7 @@ bool XmlConfigWorker::SetAppsettingsPath(const std::string& s_path) {
 }
 
 std::vector<std::string> XmlConfigWorker::GetValues(const std::string& s_path) {
-    std::vector<std::string> vec_path = UtilsMini::Split(s_path, "/");
+    std::vector<std::string> vec_path = utils::Split(s_path, "/");
     std::vector<std::string> res;
 
     if(config.RootElement()->Name() != vec_path[0])

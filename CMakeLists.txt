@@ -22,7 +22,6 @@ endif ()
 set(SHARED_SOURCES
         utils/ArchiveZipWorker.cpp
         utils/ArchiveZipWorker.h
-        utils/UtilsMini.cpp
         utils/UtilsMini.h
 )
 
