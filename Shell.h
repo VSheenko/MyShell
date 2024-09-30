@@ -8,16 +8,18 @@
 #include "utils/XmlConfigWorker.h"
 #include "utils/Logger.h"
 #include "utils/UtilsMini.h"
+#include "struct/SharedData.h"
 #include "utils/ArchiveZipWorker.h"
 #include <regex>
 #include <map>
 #include <windows.h>
 
 #define EXIT_COMMAND "exit"
-#define SHARED_MEMORY_NAME "SharedMemoryForStaticField"
-#define BUF_SIZE_FOR_SHARED_MEM 128
+
 
 namespace fs = std::filesystem;
+
+
 
 class Shell {
 private:
@@ -31,11 +33,7 @@ private:
 
     Logger* logger = nullptr;
 
-    HANDLE hMapFile;
-    char* pBufViewOfFile;
-
-    void SerializeStaticFields(char*);
-    void DeserializeStaticFields(const char*);
+    SharedData* sharedData;
 
     void SetUserName(const std::string&);
     void SetPcName(const std::string&);
@@ -49,8 +47,12 @@ private:
 public:
     explicit Shell(const std::string& s_config_path);
     ~Shell();
+
     int ExecShell();
 };
+
+
+
 
 
 #endif //MYSHELL_SHELL_H

@@ -23,6 +23,8 @@ set(SHARED_SOURCES
         utils/ArchiveZipWorker.cpp
         utils/ArchiveZipWorker.h
         utils/UtilsMini.h
+        struct/SharedData.cpp
+        struct/SharedData.h
 )
 
 set(SHARED_LIBS
