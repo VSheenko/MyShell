@@ -12,7 +12,7 @@ void ArchiveZipWorker::ChangeDirectory(std::string) {
 }
 
 bool ArchiveZipWorker::GetFileData(const std::string& s_path, std::vector<unsigned char>& buffer) {
-    fs::path dest_path = cur_directory / fs::path(s_path);
+    fs::path dest_path = s_path;
 
     mz_zip_archive archive;
     bool er_flag = ZipReaderInit(archive);
@@ -57,12 +57,10 @@ ArchiveZipWorker::ArchiveZipWorker(const std::string& s_path) {
         std::cerr << "Wrong path\n. Default archive will be used" << '\n';
         archive_path = fs::current_path() / "archive.zip";
     }
-
-    cur_directory = "";
 }
 
 bool ArchiveZipWorker::GetAllFilesNameInFolder(std::string s_path, std::vector<std::string>& res_buffer) {
-    fs::path dest_path = cur_directory / fs::path(s_path);
+    fs::path dest_path = s_path;
     bool er_flag = FolderExist(dest_path.string());
 
     if (!er_flag)
@@ -103,7 +101,11 @@ bool ArchiveZipWorker::GetAllFilesNameInFolder(std::string s_path, std::vector<s
 }
 
 bool ArchiveZipWorker::FolderExist(const std::string& s_path) {
-    fs::path dest_path = cur_directory / fs::path(s_path + "/");
+    fs::path dest_path =  (s_path + "/");
+
+    if (dest_path == "/")
+        return true;
+
     mz_zip_archive archive;
     bool er_flag = ZipReaderInit(archive);
 
@@ -154,7 +156,7 @@ bool ArchiveZipWorker::FindPath(mz_zip_archive& archive, const std::string &s_pa
 }
 
 bool ArchiveZipWorker::FileExist(const std::string &s_path) {
-    fs::path dest_path = cur_directory / fs::path(s_path);
+    fs::path dest_path = s_path;
     mz_zip_archive archive;
     bool er_flag = ZipReaderInit(archive);
 
@@ -186,6 +188,29 @@ fs::path ArchiveZipWorker::NormalizeVirtualPath(const fs::path& temp_path) {
         res /= part;
 
     return res;
+}
+
+std::string ArchiveZipWorker::GetAbsPath(std::string inp_path, std::string cur_path_in_archive) {
+    if (inp_path[inp_path.size() - 1] == '/') {
+        inp_path.erase(inp_path.size() - 1, 1);
+    }
+
+    fs::path abs_path = fs::path(cur_path_in_archive) / fs::path(inp_path);
+    abs_path = ArchiveZipWorker::NormalizeVirtualPath(abs_path);
+
+    fs::path r_path = inp_path;
+    r_path = ArchiveZipWorker::NormalizeVirtualPath(r_path);
+
+    if (abs_path.empty()) {
+        return abs_path.string(); // root
+    } else if (FolderExist(abs_path.string())) {
+        return abs_path.string();
+    } else if (FolderExist(r_path.string())) {
+        return r_path.string();
+    } else {
+        std::cerr << "No such directory: " << inp_path << std::endl;
+        return "No such directory";
+    }
 }
 
 

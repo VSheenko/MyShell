@@ -22,12 +22,12 @@ public:
     void ChangeDirectory(std::string);
     bool GetAllFilesNameInFolder(std::string, std::vector<std::string>&);
     bool GetFileData(const std::string &, std::vector<unsigned char>&);
+    std::string GetAbsPath(std::string inp_path, std::string cur_path_in_archive);
     static fs::path NormalizeVirtualPath(const fs::path& temp_path);
 private:
     bool ZipReaderInit(mz_zip_archive&);
     bool FindPath(mz_zip_archive& archive, const std::string& s_path);
 
-    fs::path cur_directory;
     fs::path archive_path;
 };
 

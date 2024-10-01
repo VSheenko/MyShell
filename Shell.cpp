@@ -92,7 +92,7 @@ int Shell::ExecShell() {
             s.erase(0, pos + 1);
 
             // Мда...
-            ExecCommand(command_links[comm_split[0]].string() + " /" + cur_path_in_archive.string() + " " +
+            ExecCommand(command_links[comm_split[0]].string() + " " +
                         (comm_split.size() != 1 ? s : ""));
         } else if (comm_split[0] == "cd" && comm_split.size() >= 2) {
             SetCurPath(comm_split[1]);
