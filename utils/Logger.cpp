@@ -7,6 +7,7 @@ namespace fs = std::filesystem;
 
 Logger::Logger(const std::string s_path) {
     fs::path log_file_path = s_path;
+    fs::create_directories(log_file_path);
 
     time_t now_time = time(NULL);
     std::tm* local_time = localtime(&now_time);
@@ -15,11 +16,13 @@ Logger::Logger(const std::string s_path) {
     std::strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H-%M-%S", local_time);
     log_file_path.append(std::string(buffer));
 
-    logFileStream.open(log_file_path.string());
+    logFileStream = new std::ofstream (log_file_path.string());
 }
 
 Logger::~Logger() {
-    logFileStream.close();
+    logFileStream->close();
+    delete logFileStream;
+    logFileStream = nullptr;
 }
 
 void Logger::Log(LogLevel level, const std::string &msg) {
@@ -29,7 +32,7 @@ void Logger::Log(LogLevel level, const std::string &msg) {
     char buffer[80];
     std::strftime(buffer, sizeof(buffer), "%H:%M:%S", local_time);
 
-    logFileStream << "[ " << GetLabel(level) << " ] [ " << std::string(buffer) << " ] " <<  msg << std::endl;
+    *logFileStream << "[ " << GetLabel(level) << " ] [ " << std::string(buffer) << " ] " <<  msg << std::endl;
 }
 
 std::string Logger::GetLabel(LogLevel logLevel) {

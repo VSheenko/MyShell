@@ -18,7 +18,7 @@ public:
 
     void Log(LogLevel, const std::string&);
 private:
-    std::ofstream logFileStream;
+    std::ofstream* logFileStream;
 
     std::string GetLabel(LogLevel);
 };

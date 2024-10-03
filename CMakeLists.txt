@@ -40,6 +40,11 @@ add_executable(ls
 )
 target_link_libraries(ls ${SHARED_LIBS})
 
+add_executable(tac
+        commands/src/tac.cpp
+        ${SHARED_SOURCES}
+)
+target_link_libraries(tac ${SHARED_LIBS})
 
 #-------------------------------------MySHell------------------------------------------------------
 add_executable(MyShell main.cpp
@@ -59,5 +64,8 @@ target_link_libraries(MyShell
 #-------------------------------------Properties--------------------------------------------------
 
 set_target_properties(ls PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY commands
+)
+set_target_properties(tac PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY commands
 )

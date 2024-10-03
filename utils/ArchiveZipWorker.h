@@ -21,8 +21,9 @@ public:
     bool AddFile(std::string s_path);
     void ChangeDirectory(std::string);
     bool GetAllFilesNameInFolder(std::string, std::vector<std::string>&);
-    bool GetFileData(const std::string &, std::vector<unsigned char>&);
+    bool GetFileData(std::string, std::vector<char>&);
     std::string GetAbsPath(std::string inp_path, std::string cur_path_in_archive);
+    std::string GetAbsPathFile(std::string inp_path, std::string cur_path_in_archive);
     static fs::path NormalizeVirtualPath(const fs::path& temp_path);
 private:
     bool ZipReaderInit(mz_zip_archive&);

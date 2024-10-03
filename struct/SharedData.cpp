@@ -48,7 +48,7 @@ void SharedData::SerializeSharedData() {
 }
 
 void SharedData::DeserializeSharedData() {
-    const char* cur_pos = pBufViewOfFile;
+    char* cur_pos = pBufViewOfFile;
 
     auto readString = [&](std::string& str) {
         size_t length;

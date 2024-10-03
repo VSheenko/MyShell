@@ -4,11 +4,13 @@
 Shell::Shell(const std::string& s_config_path) {
     XmlConfigWorker xml_worker(s_config_path);
 
+    logger = new Logger(xml_worker.GetValues("settings/log_path")[0]);
+    logger->Log(LogLevel::INFO, "The shell has been created");
+
     SetUserName(xml_worker.GetValues("settings/user_name")[0]);
     SetPcName(xml_worker.GetValues("settings/pc_name")[0]);
     SetArchivePath(xml_worker.GetValues("settings/archive_path")[0]);
 
-    logger = new Logger(xml_worker.GetValues("settings/log_path")[0]);
 
     InitCommands();
 
@@ -22,14 +24,17 @@ void Shell::SetUserName(const std::string& s_name) {
     const std::regex r("^[a-z_][a-z0-9_-]{0,31}$");
 
     if (!std::regex_match(s_name, r)) {
+        logger->Log(LogLevel::WARNING, "Incorrect user name format: " + s_name);
         std::cerr << "Incorrect user name format\n";
 
         if (cur_user.empty()){
             std::cerr << "The name ivan will be used" << '\n';
             cur_user = "ivan";
         }
+
     } else {
         cur_user = s_name;
+        logger->Log(LogLevel::INFO, "User name has been set: " + s_name);
     }
 }
 
@@ -37,6 +42,7 @@ void Shell::SetPcName(const std::string& s_name) {
     const std::regex r("^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$");
 
     if(!std::regex_match(s_name, r)) {
+        logger->Log(LogLevel::WARNING, "Incorrect pc name format: " + s_name);
         std::cerr << "Incorrect pc name format\n";
 
         if (pc_name.empty()){
@@ -44,6 +50,7 @@ void Shell::SetPcName(const std::string& s_name) {
             pc_name = "MainPc";
         }
     } else {
+        logger->Log(LogLevel::INFO, "Pc name has been set: " + s_name);
         pc_name = s_name;
     }
 }
@@ -68,14 +75,20 @@ void Shell::SetCurPath(std::string s_path) {
     } else if (zip_worker.FolderExist(r_path.string())) {
         cur_path_in_archive = r_path;
     } else {
+        logger->Log(LogLevel::WARNING, "No such directory for changing path " + s_path);
         std::cerr << "No such directory" << std::endl;
+        return;
     }
+
+    logger->Log(LogLevel::INFO, "Path has been changed " + s_path);
 }
 
 int Shell::ExecShell() {
     std::string s;
 
     PrintSystemInvitation();
+    logger->Log(LogLevel::INFO, "Shell has been opened");
+
     while (std::getline(std::cin, s)) {
         if (s.empty()) {
             PrintSystemInvitation();
@@ -88,6 +101,7 @@ int Shell::ExecShell() {
         std::vector<std::string> comm_split = utils::Split(s, " ");
 
         if (command_links.count(comm_split[0])) {
+            logger->Log(LogLevel::INFO, "Command has been found: " + comm_split[0] + " " + s);
             size_t pos = s.find(" ");
             s.erase(0, pos + 1);
 
@@ -97,11 +111,14 @@ int Shell::ExecShell() {
         } else if (comm_split[0] == "cd" && comm_split.size() >= 2) {
             SetCurPath(comm_split[1]);
         } else {
+            logger->Log(LogLevel::WARNING, "Command not found: " + comm_split[0]);
             std::cout << comm_split[0] << ": command not found" << '\n';
         }
 
         PrintSystemInvitation();
     }
+
+    logger->Log(LogLevel::INFO, "Shell has been closed");
     return 0;
 }
 
@@ -109,6 +126,8 @@ bool Shell::InitCommands(const std::string& commands_root_folder) {
     bool er_flag = fs::exists(commands_root_folder);
 
     if (!er_flag) {
+        logger->Log(LogLevel::ERR, "No such folder: " + commands_root_folder);
+
         std::cerr << "No such folder" << '\n';
         return false;
     }
@@ -120,6 +139,7 @@ bool Shell::InitCommands(const std::string& commands_root_folder) {
             command_links[command_path.filename().replace_extension("").string()] = command_path;
     }
 
+    logger->Log(LogLevel::INFO, "Commands have been initialized");
     return true;
 }
 
@@ -153,6 +173,7 @@ void Shell::ExecCommand(const std::string& args) {
     )) {
         // Ожидание завершения процесса
         WaitForSingleObject(pi.hProcess, INFINITE);
+        logger->Log(LogLevel::INFO, "Command has been executed");
 
         sharedData->DeserializeSharedData();
         cur_path_in_archive = sharedData->s_path_in_archive;
@@ -160,6 +181,7 @@ void Shell::ExecCommand(const std::string& args) {
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
     } else {
+        logger->Log(LogLevel::ERR, "Error while executing command");
         std::cerr << "Error!" << std::endl;
     }
 }
@@ -176,7 +198,9 @@ void Shell::SetArchivePath(const std::string &s_path) {
 
     if (fs::exists(dest_path) && dest_path.extension() == ".zip") {
         archive_path = dest_path;
+        logger->Log(LogLevel::INFO, "Archive path has been set");
     } else {
+        logger->Log(LogLevel::WARNING, "Wrong path");
         std::cerr << "Wrong path\n Default archive will be used" << '\n';
         archive_path = fs::current_path() / "archive.zip";
     }

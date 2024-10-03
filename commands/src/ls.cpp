@@ -53,8 +53,8 @@ int main(int argc, char* argv[]) {
         temp_path = zip_worker.GetAbsPath(temp_path, s_path_in_archive);
 
         if (temp_path == "No such directory") {
-            std::cerr << argv[1] << ": No such directory" << std::endl;
-            return 0;
+            std::cerr << argv[i] << ": No such directory" << std::endl;
+            return 1;
         }
 
         zip_worker.GetAllFilesNameInFolder(temp_path, res);
