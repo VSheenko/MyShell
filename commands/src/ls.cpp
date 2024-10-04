@@ -2,24 +2,6 @@
 #include "../../struct/SharedData.h"
 #include <string>
 
-std::string GetPathInArchive() {
-    SharedData sharedData;
-
-    sharedData.OpenFileMap();
-    sharedData.DeserializeSharedData();
-
-    return sharedData.s_path_in_archive;
-}
-
-std::string GetArchivePath() {
-    SharedData sharedData;
-
-    sharedData.OpenFileMap();
-    sharedData.DeserializeSharedData();
-
-    return sharedData.s_archive_path;
-}
-
 void PrintContent(std::vector<std::string>& content) {
     for (int i = 0; i < content.size(); i++) {
         std::cout << content[i];
@@ -32,10 +14,14 @@ void PrintContent(std::vector<std::string>& content) {
 int main(int argc, char* argv[]) {
     // argv[0] - Путь исполняемого файла
     // argv[1 - ...] - что нам нужно рассказать)
-    ArchiveZipWorker zip_worker(GetArchivePath());
-    const std::string s_path_in_archive = GetPathInArchive();
-    std::vector<std::string> res;
 
+    SharedData sharedData;
+    sharedData.OpenFileMap();
+    sharedData.DeserializeSharedData();
+
+    ArchiveZipWorker zip_worker(sharedData.s_archive_path);
+    const std::string s_path_in_archive = sharedData.s_path_in_archive;
+    std::vector<std::string> res;
 
 
     if (argc == 1) {
@@ -50,7 +36,7 @@ int main(int argc, char* argv[]) {
 
     for (int i = 1; i < argc; i++) {
         std::string temp_path = argv[i];
-        temp_path = zip_worker.GetAbsPath(temp_path, s_path_in_archive);
+        temp_path = zip_worker.GetAbsPathDir(temp_path, s_path_in_archive);
 
         if (temp_path == "No such directory") {
             std::cerr << argv[i] << ": No such directory" << std::endl;

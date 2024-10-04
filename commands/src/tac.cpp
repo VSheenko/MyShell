@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
     //argv[1- ...] - что нам нужно рассказать)
 
     for (int i = 1; i < argc; i++) {
-        std::string abs_path = zip_worker.GetAbsPath(argv[i], s_path_in_archive);
+        std::string abs_path = zip_worker.GetAbsPathFile(argv[i], s_path_in_archive);
 
         if (abs_path == "No such file or directory") {
             std::cerr << "tac: " << argv[i] << ": No such file or directory" << std::endl;

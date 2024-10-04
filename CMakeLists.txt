@@ -69,3 +69,6 @@ set_target_properties(ls PROPERTIES
 set_target_properties(tac PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY commands
 )
+
+
+add_subdirectory(test)
