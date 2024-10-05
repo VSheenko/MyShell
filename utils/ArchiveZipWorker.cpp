@@ -1,22 +1,10 @@
 #include <algorithm>
 #include "ArchiveZipWorker.h"
 
-bool ArchiveZipWorker::AddFile(std::string s_path) {
-    const char* data = "";
-
-    bool flag;
-}
-
-void ArchiveZipWorker::ChangeDirectory(std::string) {
-
-}
 
 bool ArchiveZipWorker::GetFileData(std::string s_path, std::vector<char>& buffer) {
     mz_zip_archive archive;
-    bool er_flag = ZipReaderInit(archive);
-
-    if (!er_flag)
-        throw std::runtime_error("Error init zip file");
+    ZipReaderInit(archive);
 
     std::replace(s_path.begin(), s_path.end(), '\\', '/');
 
@@ -28,7 +16,7 @@ bool ArchiveZipWorker::GetFileData(std::string s_path, std::vector<char>& buffer
     }
 
     mz_zip_archive_file_stat file_stat;
-    er_flag = mz_zip_reader_file_stat(&archive, file_index, &file_stat);
+    bool er_flag = mz_zip_reader_file_stat(&archive, file_index, &file_stat);
 
     if (!er_flag) {
         mz_zip_reader_end(&archive);
@@ -64,10 +52,9 @@ bool ArchiveZipWorker::GetAllFilesNameInFolder(std::string s_path, std::vector<s
         return false;
 
     mz_zip_archive archive;
-    er_flag = ZipReaderInit(archive);
 
-    if (!er_flag)
-        throw std::runtime_error("Error init zip file");
+    ZipReaderInit(archive);
+
 
     mz_uint num_files = mz_zip_reader_get_num_files(&archive);
 
@@ -107,24 +94,19 @@ bool ArchiveZipWorker::FolderExist(std::string s_path) {
     return FindPath(s_path);
 }
 
-bool ArchiveZipWorker::ZipReaderInit(mz_zip_archive &archive) {
+void ArchiveZipWorker::ZipReaderInit(mz_zip_archive &archive) {
     memset(&archive, 0, sizeof(archive));
 
     bool er_flag = mz_zip_reader_init_file(&archive, archive_path.string().c_str(), 0);
 
-    if (!er_flag) {
-        std::cerr << "Error init zip file" << '\n';
-        mz_zip_reader_end(&archive);
-    }
-
-    return er_flag;
+    if (!er_flag)
+        throw std::runtime_error("Error init zip file");
 }
 
 bool ArchiveZipWorker::FindPath(const std::string &s_path) {
     mz_zip_archive archive;
 
-    if (!ZipReaderInit(archive))
-        throw std::runtime_error("Error init zip file");
+    ZipReaderInit(archive);
 
     mz_uint files_num = mz_zip_reader_get_num_files(&archive);
 
@@ -181,7 +163,7 @@ std::string ArchiveZipWorker::NormalizeVirtualPath(const std::string& temp_path)
 
 
 
-std::string ArchiveZipWorker::GetAbsPathDir(std::string inp_path, std::string cur_path_in_archive) {
+bool ArchiveZipWorker::GetAbsPathDir(std::string& result_path, std::string inp_path, std::string cur_path_in_archive) {
     if (inp_path[inp_path.size() - 1] == '/') {
         inp_path.erase(inp_path.size() - 1, 1);
     }
@@ -192,30 +174,33 @@ std::string ArchiveZipWorker::GetAbsPathDir(std::string inp_path, std::string cu
     std::string r_path = ArchiveZipWorker::NormalizeVirtualPath(inp_path);
 
     if (abs_path.empty()) {
-        return abs_path; // root
+        result_path = abs_path; // root
     } else if (FolderExist(abs_path)) {
-        return abs_path;
+        result_path = abs_path;
     } else if (FolderExist(r_path)) {
-        return r_path;
+        result_path = r_path;
     } else {
-        return "No such file or directory";
+        return false;
     }
+
+    return true;
 }
 
-std::string ArchiveZipWorker::GetAbsPathFile(std::string inp_path, std::string cur_path_in_archive) {
+bool ArchiveZipWorker::GetAbsPathFile(std::string& result_path, std::string inp_path, std::string cur_path_in_archive) {
     std::string abs_path = cur_path_in_archive + "/" + std::string(inp_path);
     abs_path = ArchiveZipWorker::NormalizeVirtualPath(abs_path);
 
     std::string r_path = ArchiveZipWorker::NormalizeVirtualPath(inp_path);
 
-
     if (FileExist(abs_path)) {
-        return abs_path;
+        result_path = abs_path;
     } else if (FileExist(r_path)) {
-        return r_path;
+        result_path = r_path;
     } else {
-        return "No such file or directory";
+        return false;
     }
+
+    return true;
 }
 
 std::string ArchiveZipWorker::GetUnixPath(std::string s) {

@@ -1,7 +1,6 @@
 #include "../../utils/ArchiveZipWorker.h"
-#include "../../utils/UtilsMini.h"
 #include "../../struct/SharedData.h"
-#include <string>
+
 
 void Print(std::vector<char>& buffer) {
     std::string s(buffer.begin(), buffer.end());
@@ -23,10 +22,9 @@ int main(int argc, char* argv[]) {
 
     //argv[1- ...] - что нам нужно рассказать)
 
+    std::string abs_path;
     for (int i = 1; i < argc; i++) {
-        std::string abs_path = zip_worker.GetAbsPathFile(argv[i], s_path_in_archive);
-
-        if (abs_path == "No such file or directory") {
+        if (!zip_worker.GetAbsPathFile(abs_path, argv[i], s_path_in_archive)) {
             std::cerr << "tac: " << argv[i] << ": No such file or directory" << std::endl;
             return 1;
         }
@@ -39,7 +37,6 @@ int main(int argc, char* argv[]) {
         }
 
         Print(buffer);
-
     }
 
 }

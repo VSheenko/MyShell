@@ -27,7 +27,7 @@ private:
     std::string pc_name;
 
     fs::path archive_path;
-    fs::path cur_path_in_archive;
+    std::string cur_path_in_archive;
 
     std::map<std::string, fs::path> command_links;
 

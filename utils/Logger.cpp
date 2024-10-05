@@ -17,9 +17,11 @@ Logger::Logger(const std::string s_path) {
     log_file_path.append(std::string(buffer));
 
     logFileStream = new std::ofstream (log_file_path.string());
+    Log(LogLevel::INFO, "Logger started");
 }
 
 Logger::~Logger() {
+    Log(LogLevel::INFO, "Logger stopped");
     logFileStream->close();
     delete logFileStream;
     logFileStream = nullptr;

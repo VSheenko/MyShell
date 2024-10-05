@@ -58,21 +58,16 @@ void Shell::SetPcName(const std::string& s_name) {
 void Shell::SetCurPath(std::string s_path) {
     ArchiveZipWorker zip_worker(archive_path.string());
 
-    if (s_path[s_path.size() -1] == '/') {
-        s_path.erase(s_path.size() - 1, 1);
-    }
-
-    fs::path abs_path = cur_path_in_archive / s_path;
+    std::string abs_path = cur_path_in_archive + "/" + s_path;
     abs_path = ArchiveZipWorker::NormalizeVirtualPath(abs_path);
 
-    fs::path r_path = s_path;
-    r_path = ArchiveZipWorker::NormalizeVirtualPath(r_path);
+    std::string r_path = ArchiveZipWorker::NormalizeVirtualPath(s_path);
 
     if (abs_path.empty()) {
         cur_path_in_archive = abs_path; // root
-    } else if (zip_worker.FolderExist(abs_path.string())) {
+    } else if (zip_worker.FolderExist(abs_path)) {
         cur_path_in_archive = abs_path;
-    } else if (zip_worker.FolderExist(r_path.string())) {
+    } else if (zip_worker.FolderExist(r_path)) {
         cur_path_in_archive = r_path;
     } else {
         logger->Log(LogLevel::WARNING, "No such directory for changing path " + s_path);
@@ -155,7 +150,7 @@ void Shell::ExecCommand(const std::string& args) {
     si.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE); // Наследуем стандартный вывод
     si.hStdError = GetStdHandle(STD_ERROR_HANDLE);   // Наследуем стандартный поток ошибок
 
-    sharedData->UpdateFields(archive_path.string(), cur_path_in_archive.string());
+    sharedData->UpdateFields(archive_path.string(), cur_path_in_archive);
     sharedData->SerializeSharedData();
 
     // Запуск нового процесса
@@ -187,7 +182,7 @@ void Shell::ExecCommand(const std::string& args) {
 }
 
 void Shell::PrintSystemInvitation() {
-    std::string s_path = cur_path_in_archive.string();
+    std::string s_path = cur_path_in_archive;
     std::replace(s_path.begin(), s_path.end(), '\\', '/');
 
     std::cout << "[" << cur_user << "@" << pc_name << " /" << s_path << "]$ ";

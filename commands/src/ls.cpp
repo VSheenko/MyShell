@@ -36,14 +36,15 @@ int main(int argc, char* argv[]) {
 
     for (int i = 1; i < argc; i++) {
         std::string temp_path = argv[i];
-        temp_path = zip_worker.GetAbsPathDir(temp_path, s_path_in_archive);
+        std::string abs_path;
 
-        if (temp_path == "No such directory") {
+
+        if (!zip_worker.GetAbsPathDir(abs_path, temp_path, s_path_in_archive)) {
             std::cerr << argv[i] << ": No such directory" << std::endl;
             return 1;
         }
 
-        zip_worker.GetAllFilesNameInFolder(temp_path, res);
+        zip_worker.GetAllFilesNameInFolder(abs_path, res);
 
         if (argc > 2)
             std::cout << argv[i] << ":" << std::endl;
