@@ -37,7 +37,6 @@ set(SHARED_LIBS
 add_executable(ls
         commands/src/ls.cpp
         ${SHARED_SOURCES}
-        commands/src/echo.cpp
 )
 target_link_libraries(ls ${SHARED_LIBS})
 
@@ -52,6 +51,8 @@ add_executable(echo
         ${SHARED_SOURCES}
 )
 target_link_libraries(echo ${SHARED_LIBS})
+
+add_executable(cal commands/src/cal.cpp)
 
 #-------------------------------------MySHell------------------------------------------------------
 add_executable(MyShell main.cpp
@@ -77,6 +78,9 @@ set_target_properties(tac PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY commands
 )
 set_target_properties(echo PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY commands
+)
+set_target_properties(cal PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY commands
 )
 

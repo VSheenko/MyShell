@@ -72,3 +72,67 @@ TEST(ArchiveZipWorkerTest, GetAllFilesNameInFolder) {
         ASSERT_TRUE(std::find(expect_res.begin(), expect_res.end(), (received_res[i])) != expect_res.end());
     }
 }
+
+
+TEST(ArchiveZipWorkerTest, WrongArchivePath) {
+    ASSERT_THROW(ArchiveZipWorker zip_worker("wrong_path"), std::invalid_argument);
+    ASSERT_THROW(ArchiveZipWorker zip_worker("../../test/ArchiveZipWorker/test_other_format.7z"), std::invalid_argument);
+    ASSERT_THROW(ArchiveZipWorker zip_worker(""), std::invalid_argument);
+}
+
+
+TEST(ArchiveZipWorkerTest, GetAbsPathFile) {
+    ArchiveZipWorker zip_worker("../../test/ArchiveZipWorkerTest/TestArchive.zip");
+    std::string res;
+
+    ASSERT_EQ(false, zip_worker.GetAbsPathFile(res, "file_1_1", ""));
+
+    ASSERT_EQ(false, zip_worker.GetAbsPathFile(res, "file_2_1.bat", ""));
+
+    ASSERT_EQ(true, zip_worker.GetAbsPathFile(res, "file_1_1.txt", ""));
+    ASSERT_EQ("file_1_1.txt", res);
+
+    ASSERT_EQ(true, zip_worker.GetAbsPathFile(res, "file_2_1.bat", "folder_1_1/"));
+    ASSERT_EQ("folder_1_1/file_2_1.bat", res);
+
+    ASSERT_EQ(false, zip_worker.GetAbsPathFile(res, "folder_1_1", ""));
+
+    ASSERT_EQ(true, zip_worker.GetAbsPathFile(res,
+                                              "folder_3_1\\folder_4_1\\file_5_1.txt",
+                                              "folder_1_2\\folder_2_1"));
+    ASSERT_EQ("folder_1_2/folder_2_1/folder_3_1/folder_4_1/file_5_1.txt", res);
+
+    ASSERT_EQ(true, zip_worker.GetAbsPathFile(res,
+                                              "folder_1_2/folder_2_1/folder_3_1\\folder_4_1\\file_5_1.txt",
+                                              "folder_1_2/folder_2_1"));
+    ASSERT_EQ("folder_1_2/folder_2_1/folder_3_1/folder_4_1/file_5_1.txt", res);
+
+    ASSERT_EQ(false, zip_worker.GetAbsPathFile(res, "", ""));
+}
+
+
+TEST(ArchiveZipWorkerTest, GetAbsPathDir) {
+    ArchiveZipWorker zip_worker("../../test/ArchiveZipWorkerTest/TestArchive.zip");
+    std::string res;
+
+    ASSERT_EQ(true, zip_worker.GetAbsPathDir(res, "folder_1_1", ""));
+    ASSERT_EQ("folder_1_1", res);
+
+    ASSERT_EQ(true, zip_worker.GetAbsPathDir(res, "folder_1_1", "folder_1_1"));
+    ASSERT_EQ("folder_1_1", res);
+
+    ASSERT_EQ(true, zip_worker.GetAbsPathDir(res, "folder_1_1", "folder_1_1/"));
+    ASSERT_EQ("folder_1_1", res);
+
+    ASSERT_TRUE(zip_worker.GetAbsPathDir(res, "", "")); // root
+    ASSERT_EQ("", res);
+
+    ASSERT_FALSE(zip_worker.GetAbsPathDir(res, "folder", ""));
+    ASSERT_FALSE(zip_worker.GetAbsPathDir(res, "folder_2_1_empty", ""));
+
+    ASSERT_TRUE(zip_worker.GetAbsPathDir(res, "folder_2_1_empty", "folder_1_1"));
+    ASSERT_EQ("folder_1_1/folder_2_1_empty", res);
+
+    ASSERT_TRUE(zip_worker.GetAbsPathDir(res, "folder_1_2\\folder_2_1/folder_3_1//folder_4_1", "folder_1_2/folder_2_1"));
+    ASSERT_EQ("folder_1_2/folder_2_1/folder_3_1/folder_4_1", res);
+}

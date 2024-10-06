@@ -40,8 +40,8 @@ ArchiveZipWorker::ArchiveZipWorker(const std::string& s_path) {
     if (fs::exists(dest_path) && dest_path.extension() == ".zip") {
         archive_path = dest_path;
     } else {
-        std::cerr << "Wrong path......\nDefault archive will be used" << '\n';
-        archive_path = fs::current_path() / "archive.zip";
+        std::cerr << "Wrong zip file" << std::endl;
+        throw std::invalid_argument("Wrong zip file");
     }
 }
 
@@ -100,7 +100,7 @@ void ArchiveZipWorker::ZipReaderInit(mz_zip_archive &archive) {
     bool er_flag = mz_zip_reader_init_file(&archive, archive_path.string().c_str(), 0);
 
     if (!er_flag)
-        throw std::runtime_error("Error init zip file");
+        throw std::invalid_argument("Error init zip file");
 }
 
 bool ArchiveZipWorker::FindPath(const std::string &s_path) {
