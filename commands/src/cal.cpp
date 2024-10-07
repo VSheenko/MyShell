@@ -7,14 +7,6 @@
 #define MONTH_CAL_WIDTH 23
 #define MONTH_CAL_HEIGHT 9
 
-struct Coord {
-    short x;
-    short y;
-
-    Coord() : x(0), y(0) {}
-    Coord(short x, short y) : x(x), y(y) {}
-};
-
 struct Date {
     int day;
     int month;
@@ -73,49 +65,74 @@ int GetStartDayInMonth(Date date) {
     return time_in.tm_wday;
 }
 
+COORD GetCursorPosition() {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(hConsole, &csbi);
+    return csbi.dwCursorPosition;
+}
+
 void MoveCursorTo(short x, short y) {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     COORD pos = {x, y}; // Установка позиции (координаты)
     SetConsoleCursorPosition(hConsole, pos);
 }
 
-void PrintMonth(Date& date, Coord& coord_to_pos) {
-    MoveCursorTo(coord_to_pos.x * MONTH_CAL_WIDTH, coord_to_pos.y * MONTH_CAL_HEIGHT);
+void PrintMonth(Date& date, COORD& coord_to_pos, COORD& initial_position, bool w = false) {
+    short x = initial_position.X + coord_to_pos.X * MONTH_CAL_WIDTH;
+    short y = initial_position.Y + coord_to_pos.Y * MONTH_CAL_HEIGHT;
+    MoveCursorTo(x, y);
 
     std::string s_month_line = std::string((MONTH_CAL_WIDTH - GetMonthName(date.month).size() - std::to_string(date.year).size() - 2) / 2, ' ')
             + GetMonthName(date.month)
             + " " + std::to_string(date.year);
 
     std::cout << std::left << std::setw(MONTH_CAL_WIDTH - 1) << s_month_line;
-    MoveCursorTo(coord_to_pos.x * MONTH_CAL_WIDTH, coord_to_pos.y * MONTH_CAL_HEIGHT + 1);
-    std::cout << std::left << "Su Mo Tu We Th Fr Sa";
+    MoveCursorTo(x, y + 1);
+
 
     int num_days = GetNumDayInMonth(date);
     int start_day = GetStartDayInMonth(date);
 
+    if (w) {
+        std::cout << std::left << "Mo Tu We Th Fr Sa Su";
+        if (start_day == 0) {
+            start_day = 6;
+        } else
+            start_day--;
+    } else {
+        std::cout << std::left << "Su Mo Tu We Th Fr Sa";
+    }
+
     for (int i = 0; i < start_day + num_days; i++) {
         if (i % 7 == 0) {
-            MoveCursorTo(coord_to_pos.x * MONTH_CAL_WIDTH, coord_to_pos.y * MONTH_CAL_HEIGHT + 2 + i / 7);
+            MoveCursorTo(x, y + 2 + i / 7);
         }
         if (i < start_day) {
             std::cout << "   ";
         } else {
-            std::cout << std::setw(3) << i - start_day + 1;
+            std::cout << std::right << std::setw(2) << i - start_day + 1 << ' ';
         }
     }
+
+    std::cout << '\n' << std::endl;
 }
 
-void PrintYear(int year) {
+void PrintYear(COORD& initial_coord, int year, bool m = false) {
+    COORD cal_position;
     for (int i = 1; i <= 12; i++) {
         Date date(1, i, year);
-        Coord coord((i - 1) % 3, (i - 1) / 3);
-        PrintMonth(date, coord);
+        cal_position.X = (i - 1) % 3;
+        cal_position.Y = (i - 1) / 3;
+        PrintMonth(date, cal_position, initial_coord, true);
     }
 }
 
 
 
 int main (int argc, char* argv[]) {
-    PrintYear(2024);
-    std::cin.get();
+    std::cout << std::endl;
+    COORD cur_pos = GetCursorPosition();
+
+    PrintYear(cur_pos, 2024);
 }
