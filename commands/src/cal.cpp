@@ -3,6 +3,8 @@
 #include <ctime>
 #include <string>
 #include <windows.h>
+#include <vector>
+#include <cstring>
 
 #define MONTH_CAL_WIDTH 23
 #define MONTH_CAL_HEIGHT 9
@@ -78,7 +80,7 @@ void MoveCursorTo(short x, short y) {
     SetConsoleCursorPosition(hConsole, pos);
 }
 
-void PrintMonth(Date& date, COORD& coord_to_pos, COORD& initial_position, bool w = false) {
+void PrintMonth(Date& date, COORD& coord_to_pos, COORD& initial_position, bool m) {
     short x = initial_position.X + coord_to_pos.X * MONTH_CAL_WIDTH;
     short y = initial_position.Y + coord_to_pos.Y * MONTH_CAL_HEIGHT;
     MoveCursorTo(x, y);
@@ -94,7 +96,7 @@ void PrintMonth(Date& date, COORD& coord_to_pos, COORD& initial_position, bool w
     int num_days = GetNumDayInMonth(date);
     int start_day = GetStartDayInMonth(date);
 
-    if (w) {
+    if (m) {
         std::cout << std::left << "Mo Tu We Th Fr Sa Su";
         if (start_day == 0) {
             start_day = 6;
@@ -118,21 +120,170 @@ void PrintMonth(Date& date, COORD& coord_to_pos, COORD& initial_position, bool w
     std::cout << '\n' << std::endl;
 }
 
-void PrintYear(COORD& initial_coord, int year, bool m = false) {
+void PrintYear(COORD& initial_coord, int year, bool m) {
     COORD cal_position;
     for (int i = 1; i <= 12; i++) {
         Date date(1, i, year);
         cal_position.X = (i - 1) % 3;
         cal_position.Y = (i - 1) / 3;
-        PrintMonth(date, cal_position, initial_coord, true);
+        PrintMonth(date, cal_position, initial_coord, m);
     }
 }
 
 
+// -keys --------------------
+
+bool m = false; // Monday as first day of week
+bool y = false; // show the whole year
+bool Y = false; // show the next twelve months
+bool three = false; // show three months spanning the date
+
+
+bool SetKeys(const std::string& key) {
+    if (key == "-m" || key == "--monday") {
+        m = true;
+    } else if (key == "-y" || key == "--year") {
+        y = true;
+    } else if (key == "-Y" || key == "--next-year") {
+        Y = true;
+    } else if (key == "-3" || key == "--three") {
+        three = true;
+    } else {
+        std::cerr << "cal: invalid option -- '" << key << "'" << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+
+void PrintCal(COORD& initial_coord, Date& date) {
+    MoveCursorTo(initial_coord.X, ++initial_coord.Y);
+
+    if (y) {
+        PrintYear(initial_coord, date.year, m);
+        return;
+    }
+
+    if (Y) {
+        date.year++;
+        PrintYear(initial_coord, date.year, m);
+        return;
+    }
+
+    if (three) {
+        COORD cal_position;
+        for (int i = -1; i < 2; i++) {
+            Date new_date(date.day, date.month + i, date.year);
+            cal_position.X = i + 1;
+            cal_position.Y = 0;
+            PrintMonth(new_date, cal_position, initial_coord, m);
+        }
+        return;
+    }
+
+    COORD c;
+    c.X = 0;
+    c.Y = 0;
+
+    PrintMonth(date, c, initial_coord, m);
+}
+
+bool CheckDate(Date& date) {
+    if (date.month < 1 || date.month > 12) {
+        std::cerr << "cal: " << date.month << ": month must be in range 1..12" << std::endl;
+        return false;
+    }
+
+    if (date.day < 1 || date.day > GetNumDayInMonth(date)) {
+        std::cerr << "cal: " << date.day << ": day must be in range 1.." << GetNumDayInMonth(date) << std::endl;
+        return false;
+    }
+
+    if (date.year < 1970) {
+        std::cerr << "cal: " << date.year << ": year must be in range 1970.." << std::endl;
+        return false;
+    }
+
+    return true;
+}
 
 int main (int argc, char* argv[]) {
-    std::cout << std::endl;
+
     COORD cur_pos = GetCursorPosition();
 
-    PrintYear(cur_pos, 2024);
+    SYSTEMTIME st;
+    GetLocalTime(&st);
+    Date date(1, st.wMonth, st.wYear);
+
+    if (argc == 1) {
+        PrintCal(cur_pos, date);
+        return 0;
+    }
+
+    std::vector<std::string> params;
+
+    for (int i = 1; i < argc; i++) {
+        if (argv[i][0] == '-') {
+            if (strcmp(argv[i], "--help") == 0) {
+                std::cout << "Usage:\n"
+                             " cal [options] [[[day] month] year]\n"
+                             " \n"
+                             "Display a calendar, or some part of it.\n"
+                             "Without any arguments, display the current month.\n"
+                             " \n"
+                             "Options:\n"
+                             " -3, --three           show three months spanning the date\n"
+                             " -m, --monday          Monday as first day of week\n"
+                             " -y, --year            show the whole year\n"
+                             " -Y, --twelve          show the next twelve months\n"
+                             " \n"
+                             " -h, --help            display this help\n";
+                return 0;
+            }
+
+            if (!SetKeys(argv[i])) {
+                std::cerr << "Try 'cal --help' for more information." << std::endl;
+                return 1;
+            }
+        } else {
+            params.push_back(argv[i]);
+        }
+    }
+
+    if (params.size() > 3) {
+        std::cerr << "cal: bad usage" << std::endl;
+        std::cerr << "Try 'cal --help' for more information." << std::endl;
+        return 1;
+    }
+
+    if (params.size() == 1) {
+        date.year = std::stoi(params[0]);
+
+        if (!CheckDate(date))
+            return 1;
+
+        std::cout << '\n';
+        PrintYear(cur_pos, date.year, m);
+        return 0;
+    }
+
+    if (params.size() == 2) {
+        date.month = std::stoi(params[0]);
+        date.year = std::stoi(params[1]);
+
+        if (!CheckDate(date))
+            return 1;
+    }
+
+    if (params.size() == 3) {
+        date.day = std::stoi(params[0]);
+        date.month = std::stoi(params[1]);
+        date.year = std::stoi(params[2]);
+
+        if (!CheckDate(date))
+            return 1;
+    }
+
+    PrintCal(cur_pos, date);
 }
