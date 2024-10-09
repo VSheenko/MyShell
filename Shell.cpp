@@ -12,7 +12,7 @@ Shell::Shell(const std::string& s_config_path) {
     SetArchivePath(xml_worker.GetValues("settings/archive_path")[0]);
 
 
-    InitCommands();
+    InitCommands(xml_worker.GetValues("settings/commands_path")[0]);
 
     sharedData = new SharedData();
     sharedData->CreateFileMap();
@@ -195,7 +195,7 @@ void Shell::SetArchivePath(const std::string &s_path) {
         archive_path = dest_path;
         logger->Log(LogLevel::INFO, "Archive path has been set");
     } else {
-        logger->Log(LogLevel::WARNING, "Wrong path");
+        logger->Log(LogLevel::WARNING, "Wrong archive path " + s_path);
         std::cerr << "Wrong path\n Default archive will be used" << '\n';
         archive_path = fs::current_path() / "archive.zip";
     }

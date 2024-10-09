@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<settings>
+    <user_name>vladimir</user_name>
+    <pc_name>host</pc_name>
+    <archive_path>archive.zip</archive_path>
+    <log_path>logs/</log_path>
+    <commands_path>commands/</commands_path>
+    <test_1>
+        <test_2>
+            <test_1_3>test</test_1_3>
+            <test_1_3>test</test_1_3>
+        </test_2>
+        <test_2>
+            <test_2_3>test</test_2_3>
+            <test_2_3>test</test_2_3>
+        </test_2>
+    </test_1>
+</settings>

@@ -14,9 +14,9 @@ namespace xml = tinyxml2;
 class XmlConfigWorker {
 public:
     explicit XmlConfigWorker(const std::string&);
-    bool SetAppsettingsPath(const std::string&);
     std::vector<std::string> GetValues(const std::string&);
 private:
+    bool SetAppsettingsPath(const std::string&);
     xml::XMLDocument config;
     fs::path file_path;
 

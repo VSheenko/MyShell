@@ -42,7 +42,7 @@ private:
 
     void PrintSystemInvitation();
     void ExecCommand(const std::string& args);
-    bool InitCommands(const std::string& commands_root_folder = "commands");
+    bool InitCommands(const std::string& commands_root_folder);
 
 public:
     explicit Shell(const std::string& s_config_path);

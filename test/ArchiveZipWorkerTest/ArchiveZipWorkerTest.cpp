@@ -5,6 +5,8 @@
 #include "../../utils/ArchiveZipWorker.h"
 #include "gtest/gtest.h"
 
+#define ARCHIVE_PATH "../../test/ArchiveZipWorkerTest/TestArchive.zip"
+
 TEST(ArchiveZipWorkerTest, NormalizeVirtualPath) {
     std::string s_path = "C:\\Users\\VSheenko\\Desktop\\test\\test.zip";
     std::string res = ArchiveZipWorker::NormalizeVirtualPath(s_path);
@@ -44,7 +46,7 @@ TEST(ArchiveZipWorkerTest, NormalizeVirtualPath) {
 
 
 TEST(ArchiveZipWorkerTest, GetAllFilesNameInFolder) {
-    ArchiveZipWorker zip_worker("../../test/ArchiveZipWorkerTest/TestArchive.zip");
+    ArchiveZipWorker zip_worker(ARCHIVE_PATH);
 
     std::vector<std::string> received_res;
     std::vector<std::string> expect_res = {"folder_1_1/", "folder_1_2/", "file_1_1.txt", "file_1_2"};
@@ -82,7 +84,7 @@ TEST(ArchiveZipWorkerTest, WrongArchivePath) {
 
 
 TEST(ArchiveZipWorkerTest, GetAbsPathFile) {
-    ArchiveZipWorker zip_worker("../../test/ArchiveZipWorkerTest/TestArchive.zip");
+    ArchiveZipWorker zip_worker(ARCHIVE_PATH);
     std::string res;
 
     ASSERT_EQ(false, zip_worker.GetAbsPathFile(res, "file_1_1", ""));
@@ -112,7 +114,7 @@ TEST(ArchiveZipWorkerTest, GetAbsPathFile) {
 
 
 TEST(ArchiveZipWorkerTest, GetAbsPathDir) {
-    ArchiveZipWorker zip_worker("../../test/ArchiveZipWorkerTest/TestArchive.zip");
+    ArchiveZipWorker zip_worker("ARCHIVE_PATH");
     std::string res;
 
     ASSERT_EQ(true, zip_worker.GetAbsPathDir(res, "folder_1_1", ""));
@@ -136,3 +138,4 @@ TEST(ArchiveZipWorkerTest, GetAbsPathDir) {
     ASSERT_TRUE(zip_worker.GetAbsPathDir(res, "folder_1_2\\folder_2_1/folder_3_1//folder_4_1", "folder_1_2/folder_2_1"));
     ASSERT_EQ("folder_1_2/folder_2_1/folder_3_1/folder_4_1", res);
 }
+

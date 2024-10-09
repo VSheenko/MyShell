@@ -1,8 +1,11 @@
 #include "Shell.h"
 
-int main() {
-    Shell shell("Z:\\Projects\\MyShell\\cmake-build-debug\\appsettings.xml");
-    if (!shell.ExecShell()) {
+#define APPSETTINGS_FILE "./appsettings.xml"
+
+int main(int argc, char* argv[]) {
+    Shell shell(APPSETTINGS_FILE);
+
+    if (shell.ExecShell()) {
         std::cout << "Error" << std::endl;
         std::cout << "Press any key to exit" << std::endl;
         std::cin.get();

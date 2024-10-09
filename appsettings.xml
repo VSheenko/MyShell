@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <settings>
-    <user_name>Ivan</user_name>
-    <pc_name>MainPC</pc_name>
-    <archive_path>filesystem.zip</archive_path>
+    <user_name>vladimir</user_name>
+    <pc_name>host</pc_name>
+    <archive_path>archive.zip</archive_path>
     <log_path>logs/</log_path>
-    <start_script_path>я хз зачем он</start_script_path>
+    <commands_path>commands/</commands_path>
 </settings>

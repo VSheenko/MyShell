@@ -17,10 +17,10 @@ XmlConfigWorker::XmlConfigWorker(const std::string& s_path) {
 
         std::unordered_map<std::string, std::string> settings {
                 {"user_name", "ivan"},
-                {"pc_name", "MainPC"},
-                {"archive_path", "filesystem.zip"},
+                {"pc_name", "host"},
+                {"archive_path", "archive.zip"},
                 {"log_path", "logs/"},
-                {"start_script_path", "-"}
+                {"commands_path", "commands/"}
         };
 
 
@@ -56,6 +56,10 @@ bool XmlConfigWorker::SetAppsettingsPath(const std::string& s_path) {
 std::vector<std::string> XmlConfigWorker::GetValues(const std::string& s_path) {
     std::vector<std::string> vec_path = utils::Split(s_path, "/");
     std::vector<std::string> res;
+
+    if (vec_path.size() <= 1) {
+        return {};
+    }
 
     if(config.RootElement()->Name() != vec_path[0])
         return {};
