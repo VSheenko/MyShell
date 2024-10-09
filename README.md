@@ -155,3 +155,35 @@ folder_1/folder_2/file_2 => line 5
 ```
 
 ### Пример использования **`cd`**
+Поддерживает относительные и абсолютные пути к директориям 
+
+![doc/img/cd example.png](https://github.com/VSheenko/MyShell/blob/master/doc/img/cd%20example.png)
+
+### **`ls`**
+Поддерживает обработку нескольких параметров
+
+![doc/img/ls example.png](https://github.com/VSheenko/MyShell/blob/master/doc/img/ls%20example.png)
+
+### **`cal`**
+
+Для полчения подробностей `cal --help`
+
+![doc/img/cal example.png](https://github.com/VSheenko/MyShell/blob/master/doc/img/cal%20example%201.png)
+
+![doc/img/cal example.png](https://github.com/VSheenko/MyShell/blob/master/doc/img/cal%20example%202.png)
+
+### **`echo`**
+
+Ключи:
+- -e - обрабатывает escape-последовательности
+- -E (по умолчанию) - отключает обработку escape-последовательностей
+- -n - убирвет перенос на следующую строку
+
+![doc/img/echo example.png](https://github.com/VSheenko/MyShell/blob/master/doc/img/echo%20example.png)
+
+### **`tac`**
+
+![doc/img/echo example.png](https://github.com/VSheenko/MyShell/blob/master/doc/img/tac%20example.png)
+
+### **`exit`**
+Используется для выхода из эмулятора
